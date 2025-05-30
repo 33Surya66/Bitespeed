@@ -3,7 +3,14 @@ import { PrismaClient } from '@prisma/client';
 import { identifyContact } from './controllers/identifyController';
 
 const app = express();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'error', 'warn'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+});
 
 app.use(express.json());
 

@@ -26,7 +26,7 @@ export const identifyContact = async (req: Request, res: Response) => {
 
   try {
     // Find contacts matching email or phoneNumber
-    const existingContacts = await prisma.contact.findMany({
+    let existingContacts = await prisma.contact.findMany({
       where: {
         OR: [
           { email: email || undefined },
