@@ -7,8 +7,17 @@ import { errorHandler } from './middlewares/errorHandler';
 import cron from 'node-cron';
 import axios from 'axios';
 import logger from './utils/logger';
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
+const prisma = new PrismaClient({
+  log: ['query', 'error', 'warn'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+});
 
 app.use(helmet());
 app.use(express.json());
@@ -38,7 +47,7 @@ app.get('/health', (req, res) => {
 });
 
 // Identify endpoint
-app.post('/identify', identifyContact);
+app.post('/identify', (req, res) => identifyContact(req, res, prisma));
 
 // Error handling middleware
 app.use(errorHandler);
