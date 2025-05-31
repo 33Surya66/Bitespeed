@@ -1,6 +1,6 @@
 # Bitespeed Identity Reconciliation API
 
-An identity reconciliation API for consolidating customer contact information for FluxKart.com, integrating with Bitespeed. This API provides an `/identify` endpoint to reconcile contacts using email and phone number, with a PostgreSQL database managed via Prisma. Deployed on Render with self-pinging to prevent free-tier spin-down.
+A robust identity reconciliation API for consolidating customer contact information. This API provides an `/identify` endpoint to reconcile contacts using email and phone number, with a PostgreSQL database managed via Prisma. Deployed on Render with self-pinging to prevent free-tier spin-down.
 
 ## Features
 
@@ -27,10 +27,9 @@ npm install
 ### 3. Set up environment
 Create a `.env` file with the following configuration:
 ```plaintext
-DATABASE_URL=postgresql://username:password@ep-weathered-scene-a8vaboer-pooler.eastus2.azure.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://username:password@localhost:5432/your_database_name
 RENDER_URL=https://bitespeed-identity-f3d4.onrender.com
 PORT=3000
-PRISMA_ENGINE_TYPE=binary
 ```
 
 ### 4. Run migrations
@@ -123,7 +122,7 @@ npm run test:postman
 
 - **Hosting**: Render - https://bitespeed-identity-f3d4.onrender.com
 - **Runtime**: Node.js 20.19.x
-- **Database**: PostgreSQL (Neon.tech)
+- **Database**: PostgreSQL
 
 ## Links
 
