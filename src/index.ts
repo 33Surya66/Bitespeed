@@ -44,7 +44,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK' });
+  try {
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Health check failed:', { error: error instanceof Error ? error.message : 'Unknown error' });
+    res.status(500).json({ status: 'ERROR', message: 'Health check failed' });
+  }
 });
 
 // Identify endpoint with error handling
@@ -65,10 +70,17 @@ app.use((err: Error, req: express.Request, res: express.Response) => {
 const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity-f3d4.onrender.com';
 cron.schedule('*/10 * * * *', async () => {
   try {
-    await axios.get(`${BASE_URL}/health`);
-    logger.info('Self-ping successful');
+    const response = await axios.get(`${BASE_URL}/health`);
+    if (response.status === 200) {
+      logger.info('Self-ping successful');
+    } else {
+      logger.warn('Self-ping returned non-200 status:', response.status);
+    }
   } catch (error) {
-    logger.error(`Self-ping failed: ${error}`);
+    logger.error('Self-ping failed:', { 
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

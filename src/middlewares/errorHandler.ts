@@ -3,8 +3,13 @@ import { ZodError } from 'zod';
 import logger from '../utils/logger';
 
 export const errorHandler = (err: Error, req: Request, res: Response) => {
-  // Log the error
-  logger.error('Error:', err);
+  // Log only essential error information
+  logger.error('Error occurred:', {
+    message: err.message,
+    name: err.name,
+    path: req.path,
+    method: req.method
+  });
 
   // Handle different types of errors
   if (err instanceof ZodError) {
