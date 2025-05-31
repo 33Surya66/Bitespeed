@@ -1,0 +1,285 @@
+{
+  "info": {
+    "name": "Bitespeed Identity Reconciliation Tests",
+    "_postman_id": "bitespeed-tests",
+    "description": "Tests for Bitespeed Identity Reconciliation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create New Primary Contact",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"lorraine@hillvalley.edu\",\"phoneNumber\":\"123456\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response has primaryContatctId', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.primaryContatctId).to.be.a('number');",
+              "});",
+              "pm.test('Response has correct email and phone', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.emails).to.include('lorraine@hillvalley.edu');",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.include('123456');",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Link Secondary Contact",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"mcfly@hillvalley.edu\",\"phoneNumber\":\"123456\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response links secondary contact', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.emails).to.have.members(['lorraine@hillvalley.edu', 'mcfly@hillvalley.edu']);",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.include('123456');",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.have.lengthOf(1);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Merge Primary Contacts",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"george@hillvalley.edu\",\"phoneNumber\":\"919191\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response creates new primary', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.emails).to.include('george@hillvalley.edu');",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.include('919191');",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Link and Merge Primary",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"george@hillvalley.edu\",\"phoneNumber\":\"717171\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response merges primary contacts', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.emails).to.include('george@hillvalley.edu');",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.have.members(['919191', '717171']);",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.have.lengthOf(1);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Only Email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"doc@hillvalley.edu\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response handles email only', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.emails).to.include('doc@hillvalley.edu');",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.be.empty;",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Only PhoneNumber",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"phoneNumber\":\"456789\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response handles phone only', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.contact.phoneNumbers).to.include('456789');",
+              "  pm.expect(jsonData.contact.emails).to.be.empty;",
+              "  pm.expect(jsonData.contact.secondaryContactIds).to.be.empty;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/identify",
+          "host": ["{{baseUrl}}"],
+          "path": ["identify"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400', () => pm.response.to.have.status(400));",
+              "pm.test('Response has error message', () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.error).to.be.a('string');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
