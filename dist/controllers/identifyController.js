@@ -133,7 +133,7 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
             }
         }
         // Create a new secondary contact if new data
-        const exactMatch = existingContacts.find(c => c.email === email && c.phoneNumber === phoneNumber);
+        const exactMatch = existingContacts.find((c) => c.email === email && c.phoneNumber === phoneNumber);
         if (!exactMatch) {
             const newSecondary = yield prisma.contact.create({
                 data: {
@@ -161,9 +161,9 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
         if (email) {
             matchingEmails.add(email);
             // Add any other emails from contacts that share this email
-            allContacts.forEach(contact => {
+            allContacts.forEach((contact) => {
                 if (contact.email === email) {
-                    allContacts.forEach(c => {
+                    allContacts.forEach((c) => {
                         if (c.email)
                             matchingEmails.add(c.email);
                     });
@@ -172,13 +172,13 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
         }
         // Consolidate unique emails and phone numbers
         const emails = [...new Set(allContacts
-                .filter(c => !email || (c.email && matchingEmails.has(c.email)))
-                .map(c => c.email)
+                .filter((c) => !email || (c.email && matchingEmails.has(c.email)))
+                .map((c) => c.email)
                 .filter((e) => !!e))];
-        const phoneNumbers = [...new Set(allContacts.map(c => c.phoneNumber).filter((p) => !!p))];
+        const phoneNumbers = [...new Set(allContacts.map((c) => c.phoneNumber).filter((p) => !!p))];
         const secondaryContactIds = allContacts
-            .filter(c => c.linkPrecedence === 'secondary')
-            .map(c => c.id);
+            .filter((c) => c.linkPrecedence === 'secondary')
+            .map((c) => c.id);
         logger_1.default.info(`Returning consolidated contact: ${primaryContact.id}`);
         return res.status(200).json({
             contact: {

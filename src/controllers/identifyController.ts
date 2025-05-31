@@ -3,6 +3,18 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import logger from '../utils/logger';
 
+// Define the Contact type based on the Prisma schema
+type Contact = {
+  id: number;
+  phoneNumber: string | null;
+  email: string | null;
+  linkedId: number | null;
+  linkPrecedence: 'primary' | 'secondary';
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+};
+
 const contactSchema = z.object({
   email: z.string().email().nullable().optional(),
   phoneNumber: z.string().nullable().optional()
@@ -102,7 +114,7 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
     }
 
     // Find the oldest primary contact
-    let primaryContact = existingContacts.reduce((prev, curr) =>
+    let primaryContact = existingContacts.reduce((prev: Contact, curr: Contact) =>
       prev.createdAt < curr.createdAt ? prev : curr
     );
 
@@ -133,7 +145,7 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
 
     // Create a new secondary contact if new data
     const exactMatch = existingContacts.find(
-      c => c.email === email && c.phoneNumber === phoneNumber
+      (c: Contact) => c.email === email && c.phoneNumber === phoneNumber
     );
     if (!exactMatch) {
       const newSecondary = await prisma.contact.create({
@@ -164,9 +176,9 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
     if (email) {
       matchingEmails.add(email);
       // Add any other emails from contacts that share this email
-      allContacts.forEach(contact => {
+      allContacts.forEach((contact: Contact) => {
         if (contact.email === email) {
-          allContacts.forEach(c => {
+          allContacts.forEach((c: Contact) => {
             if (c.email) matchingEmails.add(c.email);
           });
         }
@@ -175,13 +187,13 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
 
     // Consolidate unique emails and phone numbers
     const emails = [...new Set(allContacts
-      .filter(c => !email || (c.email && matchingEmails.has(c.email)))
-      .map(c => c.email)
-      .filter((e): e is string => !!e))];
-    const phoneNumbers = [...new Set(allContacts.map(c => c.phoneNumber).filter((p): p is string => !!p))];
+      .filter((c: Contact) => !email || (c.email && matchingEmails.has(c.email)))
+      .map((c: Contact) => c.email)
+      .filter((e: string | null): e is string => !!e))];
+    const phoneNumbers = [...new Set(allContacts.map((c: Contact) => c.phoneNumber).filter((p: string | null): p is string => !!p))];
     const secondaryContactIds = allContacts
-      .filter(c => c.linkPrecedence === 'secondary')
-      .map(c => c.id);
+      .filter((c: Contact) => c.linkPrecedence === 'secondary')
+      .map((c: Contact) => c.id);
 
     logger.info(`Returning consolidated contact: ${primaryContact.id}`);
     return res.status(200).json({
