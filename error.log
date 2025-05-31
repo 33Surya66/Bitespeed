@@ -1,0 +1,4 @@
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:04:51.222Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:05:37.157Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:05:56.813Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:06:26.018Z"}

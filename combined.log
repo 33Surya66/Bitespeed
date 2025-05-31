@@ -1,2 +1,19 @@
 {"level":"info","message":"Server running on port 3000","timestamp":"2025-05-31T02:37:08.414Z"}
 {"level":"info","message":"Server running on port 3000","timestamp":"2025-05-31T02:40:41.020Z"}
+{"level":"info","message":"Request: {}","timestamp":"2025-05-31T03:04:51.215Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:04:51.222Z"}
+{"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:04:51.242Z"}
+{"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:04:51.245Z"}
+{"level":"info","message":"Request: {}","timestamp":"2025-05-31T03:05:37.149Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:05:37.157Z"}
+{"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:05:37.187Z"}
+{"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:05:37.194Z"}
+{"level":"info","message":"Request: {}","timestamp":"2025-05-31T03:05:56.809Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:05:56.813Z"}
+{"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:05:56.825Z"}
+{"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:05:56.827Z"}
+{"level":"info","message":"Request: {}","timestamp":"2025-05-31T03:06:26.013Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:06:26.018Z"}
+{"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:06:26.029Z"}
+{"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:06:26.034Z"}
+{"level":"info","message":"Server running on port 3000","timestamp":"2025-05-31T03:06:31.240Z"}

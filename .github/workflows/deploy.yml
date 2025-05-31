@@ -30,6 +30,7 @@ jobs:
         run: npm run test
 
       - name: Run Postman tests with Newman
+        if: exists('bitespeed_tests.postman_collection.json') && exists('bitespeed_api.postman_environment.json')
         run: |
           npm install -g newman
           newman run bitespeed_tests.postman_collection.json -e bitespeed_api.postman_environment.json

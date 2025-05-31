@@ -76,7 +76,7 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
     const parsed = contactSchema.safeParse(req.body);
     if (!parsed.success) {
       logger.error(`Validation error: ${parsed.error.message}`);
-      return res.status(400).json({ error: parsed.error.message });
+      return res.status(400).json({ error: 'At least one of email or phoneNumber is required' });
     }
 
     const { email, phoneNumber } = parsed.data;
