@@ -3,8 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import logger from '../utils/logger';
 
-const prisma = new PrismaClient();
-
 const contactSchema = z.object({
   email: z.string().email().nullable().optional(),
   phoneNumber: z.string().nullable().optional()
@@ -60,7 +58,7 @@ const contactSchema = z.object({
  *       400:
  *         description: Invalid input
  */
-export const identifyContact = async (req: Request, res: Response) => {
+export const identifyContact = async (req: Request, res: Response, prisma: PrismaClient) => {
   logger.info(`Request: ${JSON.stringify(req.body)}`);
   try {
     const parsed = contactSchema.safeParse(req.body);

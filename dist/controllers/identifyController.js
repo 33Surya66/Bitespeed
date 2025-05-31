@@ -74,20 +74,22 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
     try {
         const parsed = contactSchema.safeParse(req.body);
         if (!parsed.success) {
+            logger_1.default.error(`Validation error: ${parsed.error.message}`);
             return res.status(400).json({ error: parsed.error.message });
         }
         const { email, phoneNumber } = parsed.data;
-        // Find existing contacts
+        // Find existing contacts (exclude soft-deleted)
         const existingContacts = yield prisma.contact.findMany({
             where: {
                 OR: [
                     { email: email !== null && email !== void 0 ? email : undefined },
                     { phoneNumber: phoneNumber !== null && phoneNumber !== void 0 ? phoneNumber : undefined }
-                ]
+                ],
+                deletedAt: null
             }
         });
+        // If no contacts exist, create a new primary contact
         if (existingContacts.length === 0) {
-            // Create new primary contact
             const newContact = yield prisma.contact.create({
                 data: {
                     email,
@@ -95,32 +97,45 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
                     linkPrecedence: 'primary'
                 }
             });
+            logger_1.default.info(`Created new primary contact: ${newContact.id}`);
             return res.status(200).json({
                 contact: {
                     primaryContatctId: newContact.id,
-                    emails: [newContact.email].filter(Boolean),
-                    phoneNumbers: [newContact.phoneNumber].filter(Boolean),
+                    emails: newContact.email ? [newContact.email] : [],
+                    phoneNumbers: newContact.phoneNumber ? [newContact.phoneNumber] : [],
                     secondaryContactIds: []
                 }
             });
         }
-        // Determine primary contact (oldest by createdAt)
-        const primaryContact = existingContacts.reduce((prev, curr) => prev.createdAt < curr.createdAt ? prev : curr);
-        // Update other contacts to secondary
+        // Find the oldest primary contact
+        let primaryContact = existingContacts.reduce((prev, curr) => prev.createdAt < curr.createdAt ? prev : curr);
+        // If the primary contact is secondary, find its primary
+        if (primaryContact.linkPrecedence === 'secondary' && primaryContact.linkedId) {
+            const linkedPrimary = yield prisma.contact.findFirst({
+                where: { id: primaryContact.linkedId, deletedAt: null }
+            });
+            if (linkedPrimary) {
+                primaryContact = linkedPrimary;
+            }
+        }
+        // Update other primary contacts to secondary
         for (const contact of existingContacts) {
             if (contact.id !== primaryContact.id && contact.linkPrecedence === 'primary') {
                 yield prisma.contact.update({
                     where: { id: contact.id },
                     data: {
                         linkPrecedence: 'secondary',
-                        linkedId: primaryContact.id
+                        linkedId: primaryContact.id,
+                        updatedAt: new Date()
                     }
                 });
+                logger_1.default.info(`Updated contact ${contact.id} to secondary, linked to ${primaryContact.id}`);
             }
         }
-        // Create new secondary contact if new data
-        if (!existingContacts.some(c => c.email === email && c.phoneNumber === phoneNumber)) {
-            yield prisma.contact.create({
+        // Create a new secondary contact if new data
+        const exactMatch = existingContacts.find(c => c.email === email && c.phoneNumber === phoneNumber);
+        if (!exactMatch) {
+            const newSecondary = yield prisma.contact.create({
                 data: {
                     email,
                     phoneNumber,
@@ -128,6 +143,8 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
                     linkedId: primaryContact.id
                 }
             });
+            existingContacts.push(newSecondary);
+            logger_1.default.info(`Created new secondary contact: ${newSecondary.id}`);
         }
         // Fetch all related contacts
         const allContacts = yield prisma.contact.findMany({
@@ -135,14 +152,34 @@ const identifyContact = (req, res, prisma) => __awaiter(void 0, void 0, void 0, 
                 OR: [
                     { id: primaryContact.id },
                     { linkedId: primaryContact.id }
-                ]
+                ],
+                deletedAt: null
             }
         });
-        const emails = [...new Set(allContacts.map(contact => contact.email).filter(Boolean))];
-        const phoneNumbers = [...new Set(allContacts.map(contact => contact.phoneNumber).filter(Boolean))];
+        // For the Link and Merge Primary case, we need to include all contacts that share the same email
+        const matchingEmails = new Set();
+        if (email) {
+            matchingEmails.add(email);
+            // Add any other emails from contacts that share this email
+            allContacts.forEach(contact => {
+                if (contact.email === email) {
+                    allContacts.forEach(c => {
+                        if (c.email)
+                            matchingEmails.add(c.email);
+                    });
+                }
+            });
+        }
+        // Consolidate unique emails and phone numbers
+        const emails = [...new Set(allContacts
+                .filter(c => !email || (c.email && matchingEmails.has(c.email)))
+                .map(c => c.email)
+                .filter((e) => !!e))];
+        const phoneNumbers = [...new Set(allContacts.map(c => c.phoneNumber).filter((p) => !!p))];
         const secondaryContactIds = allContacts
-            .filter(contact => contact.linkPrecedence === 'secondary')
-            .map(contact => contact.id);
+            .filter(c => c.linkPrecedence === 'secondary')
+            .map(c => c.id);
+        logger_1.default.info(`Returning consolidated contact: ${primaryContact.id}`);
         return res.status(200).json({
             contact: {
                 primaryContatctId: primaryContact.id,
