@@ -1,8 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import logger from '../utils/logger';
 
-export const errorHandler = (err: Error, req: Request, res: Response) => {
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   logger.error('Error:', err.message);
 
   if (err instanceof ZodError) {
@@ -14,4 +19,4 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
   return res.status(500).json({
     error: 'Internal server error'
   });
-}; 
+};
