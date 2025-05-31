@@ -25,7 +25,7 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
     // Handle different types of errors
     if (err instanceof ZodError) {
       return res.status(400).json({
-        error: "At least one of email or phoneNumber is required"
+        error: 'At least one of email or phoneNumber is required'
       });
     }
 

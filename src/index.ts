@@ -57,7 +57,7 @@ app.post('/identify', async (req, res, next) => {
 });
 
 // Error handling middleware - must be last
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   errorHandler(err, req, res);
 });
 
