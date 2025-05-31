@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { identifyContact } from './controllers/identifyController';
 
@@ -14,7 +14,7 @@ const prisma = new PrismaClient({
 
 app.use(express.json());
 
-app.post('/identify', identifyContact);
+app.post('/identify', (req, res) => identifyContact(req, res, prisma));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

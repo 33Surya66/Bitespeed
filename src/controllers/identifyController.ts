@@ -1,23 +1,12 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
-
 interface IdentifyRequest {
   email?: string;
   phoneNumber?: string;
 }
 
-interface IdentifyResponse {
-  contact: {
-    primaryContatctId: number;
-    emails: string[];
-    phoneNumbers: string[];
-    secondaryContactIds: number[];
-  };
-}
-
-export const identifyContact = async (req: Request, res: Response) => {
+export const identifyContact = async (req: Request, res: Response, prisma: PrismaClient) => {
   const { email, phoneNumber }: IdentifyRequest = req.body;
 
   if (!email && !phoneNumber) {
@@ -122,10 +111,10 @@ export const identifyContact = async (req: Request, res: Response) => {
 
     // Ensure primary contact's email/phoneNumber is first
     if (primaryContact.email) {
-      emails.sort((a, b) => (a === primaryContact.email ? -1 : 1));
+      emails.sort((a) => (a === primaryContact.email ? -1 : 1));
     }
     if (primaryContact.phoneNumber) {
-      phoneNumbers.sort((a, b) => (a === primaryContact.phoneNumber ? -1 : 1));
+      phoneNumbers.sort((a) => (a === primaryContact.phoneNumber ? -1 : 1));
     }
 
     return res.status(200).json({
