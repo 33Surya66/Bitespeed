@@ -3,6 +3,10 @@ import helmet from 'helmet';
 import { identifyContact } from './controllers/identifyController';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { errorHandler } from './middlewares/errorHandler';
+import cron from 'node-cron';
+import axios from 'axios';
+import logger from './utils/logger';
 
 const app = express();
 
@@ -36,7 +40,21 @@ app.get('/health', (req, res) => {
 // Identify endpoint
 app.post('/identify', identifyContact);
 
+// Error handling middleware
+app.use(errorHandler);
+
+// Self-pinging to keep Render service alive
+const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity.onrender.com';
+cron.schedule('*/10 * * * *', async () => {
+  try {
+    await axios.get(`${BASE_URL}/health`);
+    logger.info('Self-ping successful');
+  } catch (error) {
+    logger.error(`Self-ping failed: ${error}`);
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });

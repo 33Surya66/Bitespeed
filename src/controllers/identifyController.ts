@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import logger from '../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -60,7 +61,7 @@ const contactSchema = z.object({
  *         description: Invalid input
  */
 export const identifyContact = async (req: Request, res: Response) => {
-  console.log(`Request: ${JSON.stringify(req.body)}`);
+  logger.info(`Request: ${JSON.stringify(req.body)}`);
   try {
     const parsed = contactSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -141,11 +142,11 @@ export const identifyContact = async (req: Request, res: Response) => {
       }
     });
 
-    const emails = [...new Set(allContacts.map(c => c.email).filter(Boolean))];
-    const phoneNumbers = [...new Set(allContacts.map(c => c.phoneNumber).filter(Boolean))];
+    const emails = [...new Set(allContacts.map(contact => contact.email).filter(Boolean))];
+    const phoneNumbers = [...new Set(allContacts.map(contact => contact.phoneNumber).filter(Boolean))];
     const secondaryContactIds = allContacts
-      .filter(c => c.linkPrecedence === 'secondary')
-      .map(c => c.id);
+      .filter(contact => contact.linkPrecedence === 'secondary')
+      .map(contact => contact.id);
 
     return res.status(200).json({
       contact: {
@@ -156,7 +157,7 @@ export const identifyContact = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(`Error: ${error}`);
+    logger.error(`Error: ${error}`);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
