@@ -30,7 +30,7 @@ describe('identifyContact', () => {
   });
 
   it('should return 400 if no email or phoneNumber provided', async () => {
-    await identifyContact(req as Request, res as Response, mockPrisma as any);
+    await identifyContact(req as Request, res as Response, mockPrisma as PrismaClient);
     expect(status).toHaveBeenCalledWith(400);
     expect(json).toHaveBeenCalledWith({ error: 'At least one of email or phoneNumber is required' });
   });
@@ -45,7 +45,7 @@ describe('identifyContact', () => {
       linkPrecedence: 'primary'
     });
 
-    await identifyContact(req as Request, res as Response, mockPrisma as any);
+    await identifyContact(req as Request, res as Response, mockPrisma as PrismaClient);
     expect(status).toHaveBeenCalledWith(200);
     expect(json).toHaveBeenCalledWith({
       contact: {
