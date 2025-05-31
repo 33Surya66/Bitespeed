@@ -60,12 +60,13 @@ app.post('/identify', (req, res) => {
 app.use(errorHandler);
 
 // Self-pinging to keep Render service alive
+const RENDER_URL = process.env.RENDER_URL || 'https://bitespeed-identity-b1dq.onrender.com';
 cron.schedule('*/10 * * * *', async () => {
   try {
-    await axios.get('https://bitespeed-identity-b1dq.onrender.com/health');
+    await axios.get(`${RENDER_URL}/health`);
     logger.info('Self-ping successful');
   } catch (error) {
-    logger.error('Self-ping failed');
+    logger.error('Self-ping failed:', error);
   }
 });
 
