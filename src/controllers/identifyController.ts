@@ -6,11 +6,17 @@ interface IdentifyRequest {
   phoneNumber?: string;
 }
 
-export const identifyContact = async (req: Request, res: Response, prisma: PrismaClient) => {
+export const identifyContact = async (
+  req: Request,
+  res: Response,
+  prisma: PrismaClient
+) => {
   const { email, phoneNumber }: IdentifyRequest = req.body;
 
   if (!email && !phoneNumber) {
-    return res.status(400).json({ error: 'At least one of email or phoneNumber is required' });
+    return res
+      .status(400)
+      .json({ error: 'At least one of email or phoneNumber is required' });
   }
 
   try {
@@ -53,7 +59,8 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
     // Check if we need to create a new secondary contact
     const hasNewInfo =
       (email && !existingContacts.some((c) => c.email === email)) ||
-      (phoneNumber && !existingContacts.some((c) => c.phoneNumber === phoneNumber));
+      (phoneNumber &&
+        !existingContacts.some((c) => c.phoneNumber === phoneNumber));
 
     if (hasNewInfo) {
       const newContact = await prisma.contact.create({
@@ -69,7 +76,9 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
     }
 
     // Handle case where primary contacts need to be linked
-    const primaryContacts = existingContacts.filter((c) => c.linkPrecedence === 'primary');
+    const primaryContacts = existingContacts.filter(
+      (c) => c.linkPrecedence === 'primary'
+    );
     if (primaryContacts.length > 1) {
       // Keep the oldest as primary, make others secondary
       const oldestPrimary = primaryContacts.reduce((prev, curr) =>
@@ -93,18 +102,19 @@ export const identifyContact = async (req: Request, res: Response, prisma: Prism
       primaryContact = oldestPrimary;
       existingContacts = await prisma.contact.findMany({
         where: {
-          OR: [
-            { id: primaryContact.id },
-            { linkedId: primaryContact.id },
-          ],
+          OR: [{ id: primaryContact.id }, { linkedId: primaryContact.id }],
           deletedAt: null,
         },
       });
     }
 
     // Prepare response
-    const emails = Array.from(new Set(existingContacts.map((c) => c.email).filter(Boolean)));
-    const phoneNumbers = Array.from(new Set(existingContacts.map((c) => c.phoneNumber).filter(Boolean)));
+    const emails = Array.from(
+      new Set(existingContacts.map((c) => c.email).filter(Boolean))
+    );
+    const phoneNumbers = Array.from(
+      new Set(existingContacts.map((c) => c.phoneNumber).filter(Boolean))
+    );
     const secondaryContactIds = existingContacts
       .filter((c) => c.linkPrecedence === 'secondary')
       .map((c) => c.id);
