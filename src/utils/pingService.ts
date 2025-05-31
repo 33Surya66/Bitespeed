@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import axios from 'axios';
-import { logger } from './logger';
+import logger from './logger';
 
 const RENDER_URL = process.env.RENDER_URL || 'https://your-app-name.onrender.com';
 
