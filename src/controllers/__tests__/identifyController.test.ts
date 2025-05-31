@@ -4,7 +4,16 @@ import { PrismaClient } from '@prisma/client';
 
 jest.mock('@prisma/client');
 
-const mockPrisma = {
+// Define the type for our mock Prisma client
+type MockPrismaClient = {
+  contact: {
+    findMany: jest.Mock;
+    create: jest.Mock;
+    update: jest.Mock;
+  };
+};
+
+const mockPrisma: MockPrismaClient = {
   contact: {
     findMany: jest.fn(),
     create: jest.fn(),
@@ -30,7 +39,7 @@ describe('identifyContact', () => {
   });
 
   it('should return 400 if no email or phoneNumber provided', async () => {
-    await identifyContact(req as Request, res as Response, mockPrisma as PrismaClient);
+    await identifyContact(req as Request, res as Response, mockPrisma as unknown as PrismaClient);
     expect(status).toHaveBeenCalledWith(400);
     expect(json).toHaveBeenCalledWith({ error: 'At least one of email or phoneNumber is required' });
   });
@@ -45,7 +54,7 @@ describe('identifyContact', () => {
       linkPrecedence: 'primary'
     });
 
-    await identifyContact(req as Request, res as Response, mockPrisma as PrismaClient);
+    await identifyContact(req as Request, res as Response, mockPrisma as unknown as PrismaClient);
     expect(status).toHaveBeenCalledWith(200);
     expect(json).toHaveBeenCalledWith({
       contact: {

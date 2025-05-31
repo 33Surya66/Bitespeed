@@ -17,3 +17,7 @@
 {"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:06:26.029Z"}
 {"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:06:26.034Z"}
 {"level":"info","message":"Server running on port 3000","timestamp":"2025-05-31T03:06:31.240Z"}
+{"level":"info","message":"Request: {}","timestamp":"2025-05-31T03:31:33.898Z"}
+{"level":"error","message":"Validation error: [\n  {\n    \"code\": \"custom\",\n    \"message\": \"At least one of email or phoneNumber is required\",\n    \"path\": []\n  }\n]","timestamp":"2025-05-31T03:31:33.902Z"}
+{"level":"info","message":"Request: {\"email\":\"test@hillvalley.edu\",\"phoneNumber\":\"123456\"}","timestamp":"2025-05-31T03:31:33.906Z"}
+{"level":"info","message":"Created new primary contact: 1","timestamp":"2025-05-31T03:31:33.908Z"}
