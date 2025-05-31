@@ -120,13 +120,13 @@ npm run test:postman
 
 ## Deployment
 
-- **Hosting**: Render - https://bitespeed-identity-f3d4.onrender.com
+- **Hosting**: Render - https://bitespeed-identity-b1dq.onrender.com
 - **Runtime**: Node.js 20.19.x
 - **Database**: PostgreSQL
 
 ## Links
 
 - **GitHub Repository**: https://github.com/33Surya66/Bitespeed
-- **Live API**: https://bitespeed-identity-f3d4.onrender.com
-- **API Documentation**: https://bitespeed-identity-f3d4.onrender.com/api-docs
+- **Live API**: https://bitespeed-identity-b1dq.onrender.com
+- **API Documentation**: https://bitespeed-identity-b1dq.onrender.com/api-docs
 
