@@ -8,9 +8,20 @@ import cron from 'node-cron';
 import axios from 'axios';
 import logger from './utils/logger';
 import { PrismaClient } from '@prisma/client';
+import { execSync } from 'child_process';
 
 const app = express();
 const prisma = new PrismaClient();
+
+// Run migrations before starting the server
+try {
+  logger.info('Running database migrations...');
+  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  logger.info('Database migrations completed successfully');
+} catch (error) {
+  logger.error('Failed to run database migrations:', error);
+  process.exit(1);
+}
 
 // Basic middleware
 app.use(helmet());
@@ -58,7 +69,10 @@ cron.schedule('*/10 * * * *', async () => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+// Ensure we're using the PORT environment variable
+const PORT = parseInt(process.env.PORT || '3000', 10);
+
+// Start the server
+app.listen(PORT, '0.0.0.0', () => {
   logger.info(`Server running on port ${PORT}`);
 });
