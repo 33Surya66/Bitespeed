@@ -19,6 +19,7 @@ const prisma = new PrismaClient({
   }
 });
 
+// Middleware setup
 app.use(helmet());
 app.use(express.json());
 
@@ -32,7 +33,7 @@ const swaggerOptions = {
       description: 'API for consolidating customer contact information'
     },
     servers: [
-      { url: 'https://bitespeed-identity.onrender.com' }
+      { url: process.env.RENDER_URL || 'https://bitespeed-identity-f3d4.onrender.com' }
     ]
   },
   apis: ['./src/controllers/*.ts']
@@ -46,14 +47,22 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
 
-// Identify endpoint
-app.post('/identify', (req, res) => identifyContact(req, res, prisma));
+// Identify endpoint with error handling
+app.post('/identify', async (req, res, next) => {
+  try {
+    await identifyContact(req, res, prisma);
+  } catch (error) {
+    next(error);
+  }
+});
 
-// Error handling middleware
-app.use(errorHandler);
+// Error handling middleware - must be last
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  errorHandler(err, req, res);
+});
 
 // Self-pinging to keep Render service alive
-const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity.onrender.com';
+const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity-f3d4.onrender.com';
 cron.schedule('*/10 * * * *', async () => {
   try {
     await axios.get(`${BASE_URL}/health`);
