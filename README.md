@@ -131,10 +131,3 @@ npm run test:postman
 - **Live API**: https://bitespeed-identity-f3d4.onrender.com
 - **API Documentation**: https://bitespeed-identity-f3d4.onrender.com/api-docs
 
-## Submission
-
-Submit this project via the provided Google Form.
-
----
-
-*This API efficiently handles customer identity reconciliation for e-commerce platforms, ensuring accurate customer data management and improved user experience.*
