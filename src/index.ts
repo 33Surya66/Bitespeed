@@ -57,7 +57,21 @@ app.post('/identify', async (req, res, next) => {
 });
 
 // Error handling middleware - must be last
-app.use((err: Error, req: express.Request, res: express.Response) => {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Ensure we have a valid error
+  if (!err) {
+    err = new Error('Unknown error occurred');
+  }
+  
+  // Log the error before handling
+  logger.error('Error caught by middleware:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+
+  // Call our error handler
   errorHandler(err, req, res);
 });
 

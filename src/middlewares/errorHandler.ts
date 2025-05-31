@@ -8,29 +8,39 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
     message: err.message,
     name: err.name,
     stack: err.stack,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    path: req.path,
+    method: req.method
   });
 
+  // Ensure we have a valid response object
+  if (!res) {
+    logger.error('No response object available');
+    return;
+  }
+
+  // Ensure response methods are available
+  if (typeof res.status !== 'function') {
+    logger.error('Response status method not available');
+    return;
+  }
+
+  if (typeof res.json !== 'function') {
+    logger.error('Response json method not available');
+    return;
+  }
+
   try {
-    // Check if response object is valid and has required methods
-    if (!res || typeof res.status !== 'function' || typeof res.json !== 'function') {
-      logger.error('Invalid response object:', {
-        hasRes: !!res,
-        hasStatus: res && typeof res.status === 'function',
-        hasJson: res && typeof res.json === 'function'
+    // Handle different types of errors
+    if (err instanceof ZodError) {
+      res.status(400).json({
+        error: 'At least one of email or phoneNumber is required'
       });
       return;
     }
 
-    // Handle different types of errors
-    if (err instanceof ZodError) {
-      return res.status(400).json({
-        error: 'At least one of email or phoneNumber is required'
-      });
-    }
-
     // Handle other errors
-    return res.status(500).json({
+    res.status(500).json({
       error: err.message || 'Internal server error',
       timestamp: new Date().toISOString()
     });
