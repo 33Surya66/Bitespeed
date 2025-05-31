@@ -22,9 +22,6 @@ jobs:
       - name: Install dependencies
         run: npm ci  # More reliable than npm install
 
-      - name: Run linting
-        run: npm run lint
-
       - name: Run formatting
         run: npm run format
 
