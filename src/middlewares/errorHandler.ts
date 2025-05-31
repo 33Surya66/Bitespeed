@@ -11,15 +11,26 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
     method: req.method
   });
 
-  // Handle different types of errors
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      error: 'At least one of email or phoneNumber is required'
+  try {
+    // Handle different types of errors
+    if (err instanceof ZodError) {
+      if (res && typeof res.status === 'function' && typeof res.json === 'function') {
+        res.status(400).json({
+          error: 'At least one of email or phoneNumber is required'
+        });
+      }
+      return;
+    }
+
+    // Handle other errors
+    if (res && typeof res.status === 'function' && typeof res.json === 'function') {
+      res.status(500).json({
+        error: err.message || 'Internal server error'
+      });
+    }
+  } catch (error) {
+    logger.error('Error in error handler:', {
+      message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
-
-  // Handle other errors
-  return res.status(500).json({
-    error: err.message || 'Internal server error'
-  });
 }; 

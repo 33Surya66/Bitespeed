@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import { identifyContact } from './controllers/identifyController';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -33,7 +33,7 @@ const swaggerOptions = {
       description: 'API for consolidating customer contact information'
     },
     servers: [
-      { url: process.env.RENDER_URL || 'https://bitespeed-identity-f3d4.onrender.com' }
+      { url: process.env.RENDER_URL || 'https://bitespeed-identity-b1dq.onrender.com' }
     ]
   },
   apis: ['./src/controllers/*.ts']
@@ -43,7 +43,7 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   try {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
   } catch (error) {
@@ -53,7 +53,7 @@ app.get('/health', (req, res) => {
 });
 
 // Identify endpoint with error handling
-app.post('/identify', async (req, res, next) => {
+app.post('/identify', async (req: Request, res: Response, next: NextFunction) => {
   try {
     await identifyContact(req, res, prisma);
   } catch (error) {
@@ -62,12 +62,14 @@ app.post('/identify', async (req, res, next) => {
 });
 
 // Error handling middleware - must be last
-app.use((err: Error, req: express.Request, res: express.Response) => {
-  errorHandler(err, req, res);
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (!res.headersSent) {
+    errorHandler(err, req, res);
+  }
 });
 
 // Self-pinging to keep Render service alive
-const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity-f3d4.onrender.com';
+const BASE_URL = process.env.RENDER_URL || 'https://bitespeed-identity-b1dq.onrender.com';
 cron.schedule('*/10 * * * *', async () => {
   try {
     const response = await axios.get(`${BASE_URL}/health`);
