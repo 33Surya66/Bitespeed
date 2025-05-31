@@ -30,10 +30,13 @@ jobs:
         run: npm run test
 
       - name: Run Postman tests with Newman
-        if: exists('bitespeed_tests.postman_collection.json') && exists('bitespeed_api.postman_environment.json')
         run: |
-          npm install -g newman
-          newman run bitespeed_tests.postman_collection.json -e bitespeed_api.postman_environment.json
+          if [ -f "bitespeed_tests.postman_collection.json" ] && [ -f "bitespeed_api.postman_environment.json" ]; then
+            npm install -g newman
+            newman run bitespeed_tests.postman_collection.json -e bitespeed_api.postman_environment.json
+          else
+            echo "Postman files not found, skipping tests"
+          fi
 
       - name: Deploy to Render
         env:
