@@ -1,5 +1,6 @@
 # Bitespeed Identity Reconciliation API (TEST)
 
+**TEST IT ON**- https://bitespeed-identity-b1dq.onrender.com/identify
 A robust identity reconciliation API for consolidating customer contact information. This API provides an `/identify` endpoint to reconcile contacts using email and phone number, with a PostgreSQL database managed via Prisma. Deployed on Render with self-pinging to prevent free-tier spin-down.
 
 ## Features
